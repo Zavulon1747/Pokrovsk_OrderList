@@ -1,14 +1,21 @@
 package com.example.pokrovsk;
 
+import com.example.pokrovsk.entity.Product;
+import com.example.pokrovsk.repo.ProductRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
 
 import java.io.PrintStream;
+import java.time.LocalDateTime;
 
 @SpringBootApplication
-public class PokrovskApplication {
+
+public class PokrovskApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(PokrovskApplication.class);
@@ -26,6 +33,18 @@ public class PokrovskApplication {
             }
         });
         app.run(args);
+    }
+    @Autowired
+    private ProductRepo productRepo;
+
+    @Override
+    public void run(String... args) throws Exception {
+        if (!productRepo.findAll().isEmpty()) return;
+        this.productRepo.save(new Product("Яблоко Голд", 5, "Магазин", 99));
+        this.productRepo.save(new Product("Тыква среднеплодная", 5, "Магазин", 99));
+        this.productRepo.save(new Product("Бананы", 5, "Магазин", 99));
+        this.productRepo.save(new Product("Цемент", 5, "Строительный", 99));
+        this.productRepo.save(new Product("Средство для мойки полов", 5, "Химия", 99));
     }
 
 }

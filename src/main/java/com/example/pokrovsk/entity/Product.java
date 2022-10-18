@@ -3,35 +3,34 @@ package com.example.pokrovsk.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
 @NoArgsConstructor
+@Table(name = "product")
 public class Product {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(name = "name")
     private String name;
-
+    @Column(name = "amount")
     private int amount;
-
+    @Column(name = "department")
     private String department;
-
-    private String priceOfSelling;
-
+    @Column(name = "price_of_selling")
+    private double priceOfSelling;
+    @Column(name = "date_of_created")
     private LocalDateTime created;
-
+    @Column(name = "date_of_modified")
     private LocalDateTime modified;
-
+    @Column(name = "need_to_cancel")
     private boolean isNeedCancel;
 
-    public Product (String name, int amount, String department, String priceOfSelling) {
+    public Product (String name, int amount, String department, double priceOfSelling) {
         this.name = name;
         this.amount = amount;
         this.department = department;
@@ -42,6 +41,7 @@ public class Product {
     void onCreated() {
         this.setCreated(LocalDateTime.now());
         this.setModified(LocalDateTime.now());
+        this.setNeedCancel(false);
     }
 
     @PreUpdate

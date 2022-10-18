@@ -6,11 +6,13 @@ import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController("api/v1/products")
+@RestController
+@RequestMapping("api/v1/products")
 @Slf4j
 public class ProductController {
 
@@ -27,19 +29,19 @@ public class ProductController {
         return list;
     }
 
-    @GetMapping("/department_{departmentName}")
+    @GetMapping("/department/{departmentName}")
     public List<Product> getAllProductsByDepartment(@PathVariable String departmentName) {
-        List<Product> list = productRepo.findAll();
+        List<Product> list = productRepo.findAll().stream().filter(p -> p.getDepartment().toLowerCase().contains(departmentName.toLowerCase())).sorted(Comparator.comparing(Product::getName)).collect(Collectors.toList());
         log.info("All products had been gotten!");
-        list = list.stream().filter(p -> p.getDepartment().equals(departmentName)).sorted(Comparator.comparing(Product::getName)).collect(Collectors.toList());
         return list;
     }
-    @GetMapping("/{productName}")
-    public Product getProductByName(@PathVariable String productName) {
-        return productRepo.findByName(productName);
+    @GetMapping("/product/{productName}")
+    public List<Product> getProductByName(@PathVariable String productName) {
+        List<Product> list = productRepo.findAll().stream().filter(p -> p.getName().toLowerCase().contains(productName.toLowerCase())).sorted(Comparator.comparing(Product::getName)).collect(Collectors.toList());
+        return list;
     }
 
-    @PostMapping("/")
+    @PostMapping("/addProduct")
     public void addProduct(Product product) {
         if (product.getName().contains(");")||product.getDepartment().contains(");")) {
             log.error("Кто-то хочет внести вред в нашу базу данных");
@@ -50,7 +52,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public Product updateProductForCancel(@PathVariable long id) {
-        Product product = productRepo.findById(id).isPresent() ? productRepo.findById(id).get() : new Product("null", 0, "null", "0");
+        Product product = productRepo.findById(id).isPresent() ? productRepo.findById(id).get() : new Product("null", 0, "null", 0);
         product.setNeedCancel(true);
         productRepo.save(product);
         return product;
