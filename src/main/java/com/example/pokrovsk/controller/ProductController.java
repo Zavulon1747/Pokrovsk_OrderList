@@ -4,16 +4,13 @@ import com.example.pokrovsk.entity.Product;
 import com.example.pokrovsk.repo.ProductRepo;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
+@RestController("api/v1/products")
 @Slf4j
 public class ProductController {
 
@@ -22,7 +19,7 @@ public class ProductController {
     public ProductController(ProductRepo productRepo) {
         this.productRepo = productRepo;
     }
-
+    @GetMapping("/")
     public List<Product> getAllProducts() {
         List<Product> list = productRepo.findAll();
         log.info("All products had been gotten!");
@@ -30,18 +27,19 @@ public class ProductController {
         return list;
     }
 
-    @GetMapping("/products/department_{departmentName}")
+    @GetMapping("/department_{departmentName}")
     public List<Product> getAllProductsByDepartment(@PathVariable String departmentName) {
         List<Product> list = productRepo.findAll();
         log.info("All products had been gotten!");
         list = list.stream().filter(p -> p.getDepartment().equals(departmentName)).sorted(Comparator.comparing(Product::getName)).collect(Collectors.toList());
         return list;
     }
-
-    public Product getProductByName(String name) {
-        return productRepo.findByName(name);
+    @GetMapping("/{productName}")
+    public Product getProductByName(@PathVariable String productName) {
+        return productRepo.findByName(productName);
     }
 
+    @PostMapping("/")
     public void addProduct(Product product) {
         if (product.getName().contains(");")||product.getDepartment().contains(");")) {
             log.error("Кто-то хочет внести вред в нашу базу данных");
@@ -50,7 +48,7 @@ public class ProductController {
         productRepo.save(product);
     }
 
-    @PutMapping("/products/{id}")
+    @PutMapping("/{id}")
     public Product updateProductForCancel(@PathVariable long id) {
         Product product = productRepo.findById(id).isPresent() ? productRepo.findById(id).get() : new Product("null", 0, "null", "0");
         product.setNeedCancel(true);
