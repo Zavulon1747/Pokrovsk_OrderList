@@ -29,9 +29,9 @@
 ### API:
 ```bash
 GET localhost:8080/api/v1/products/ - get all products
-GET localhost:8080/api/v1/products/{productName} - get product by productName
-GET localhost:8080/api/v1/products/department_{pedartmentName} - get products by departmentName
-POST localhost:8080/api/v1/products/ - add product
+GET localhost:8080/api/v1/products/product/{productName} - get product by productName
+GET localhost:8080/api/v1/products/department/{pedartmentName} - get products by departmentName
+POST localhost:8080/api/v1/products/addProduct - add product
 PUT localhost:8080/api/v1/products/{id} - update product by id to cancel
 ```
 ***
