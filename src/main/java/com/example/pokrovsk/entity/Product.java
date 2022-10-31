@@ -4,13 +4,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
 @NoArgsConstructor
 @Table(name = "product")
-public class Product {
+public class Product implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +30,8 @@ public class Product {
     private LocalDateTime modified;
     @Column(name = "need_to_cancel")
     private boolean isNeedCancel;
+    @Column(name = "removed")
+    private boolean removed;
 
     public Product (String name, int amount, String department, double priceOfSelling) {
         this.name = name;
@@ -42,6 +45,7 @@ public class Product {
         this.setCreated(LocalDateTime.now());
         this.setModified(LocalDateTime.now());
         this.setNeedCancel(false);
+        this.setRemoved(false);
     }
 
     @PreUpdate

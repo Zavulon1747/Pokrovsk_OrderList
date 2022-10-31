@@ -1,5 +1,6 @@
 package com.example.pokrovsk.controller;
 
+import com.example.pokrovsk.amqp.RMQBean;
 import com.example.pokrovsk.entity.Product;
 import com.example.pokrovsk.repo.ProductRepo;
 import lombok.extern.java.Log;
@@ -17,15 +18,25 @@ import java.util.stream.Collectors;
 public class ProductController {
 
     ProductRepo productRepo;
+    RMQBean rmqBean;
 
-    public ProductController(ProductRepo productRepo) {
+    public ProductController(ProductRepo productRepo, RMQBean rmqBean) {
         this.productRepo = productRepo;
+        this.rmqBean = rmqBean;
     }
+
+
+
+    @GetMapping
+    public String getIndex() {
+        return "index";
+    }
+
     @GetMapping("/")
     public List<Product> getAllProducts() {
         List<Product> list = productRepo.findAll();
         log.info("All products had been gotten!");
-        list = list.stream().sorted(Comparator.comparing(Product::getName)).collect(Collectors.toList());
+        list = list.stream().sorted(Comparator.comparing(Product::getDepartment)).collect(Collectors.toList());
         return list;
     }
 
@@ -33,6 +44,8 @@ public class ProductController {
     public List<Product> getAllProductsByDepartment(@PathVariable String departmentName) {
         List<Product> list = productRepo.findAll().stream().filter(p -> p.getDepartment().toLowerCase().contains(departmentName.toLowerCase())).sorted(Comparator.comparing(Product::getName)).collect(Collectors.toList());
         log.info("All products had been gotten!");
+        rmqBean.receiveMessage(list.toString());
+        list.forEach(prod -> rmqBean.sendTo("product.amqp.queue", prod));
         return list;
     }
     @GetMapping("/product/{productName}")
@@ -42,7 +55,7 @@ public class ProductController {
     }
 
     @PostMapping("/addProduct")
-    public void addProduct(Product product) {
+    public void addProduct(@RequestBody Product product) {
         if (product.getName().contains(");")||product.getDepartment().contains(");")) {
             log.error("Кто-то хочет внести вред в нашу базу данных");
             throw new RuntimeException("Invalid name");
@@ -52,10 +65,15 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public Product updateProductForCancel(@PathVariable long id) {
-        Product product = productRepo.findById(id).isPresent() ? productRepo.findById(id).get() : new Product("null", 0, "null", 0);
-        product.setNeedCancel(true);
-        productRepo.save(product);
-        return product;
+        Product producto = productRepo.findById(id).isPresent() ? productRepo.findById(id).get() : new Product("null", 0, "null", 0);
+        producto.setNeedCancel(true);
+        productRepo.save(producto);
+        return producto;
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable long id) {
+        productRepo.findById(id).orElseGet(Product::new).setRemoved(true);
     }
 
 }
