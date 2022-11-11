@@ -40,11 +40,11 @@ public class PokrovskApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (!productRepo.findAll().isEmpty()) return;
-        this.productRepo.save(new Product("Яблоко Голд", 5, "Магазин", 99));
-        this.productRepo.save(new Product("Тыква среднеплодная", 5, "Магазин", 99));
-        this.productRepo.save(new Product("Бананы", 5, "Магазин", 99));
-        this.productRepo.save(new Product("Цемент", 5, "Строительный", 99));
-        this.productRepo.save(new Product("Средство для мойки полов", 5, "Химия", 99));
+        this.productRepo.save(new Product("Яблоко Голд", 5, "Магазин", 99.9));
+        this.productRepo.save(new Product("Тыква среднеплодная", 5, "Магазин", 54.5));
+        this.productRepo.save(new Product("Бананы", 5, "Магазин", 76.9));
+        this.productRepo.save(new Product("Цемент", 5, "Строительный", 349.9));
+        this.productRepo.save(new Product("Средство для мойки полов", 5, "Химия", 120.0));
     }
 
 }

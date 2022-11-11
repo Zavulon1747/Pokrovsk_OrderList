@@ -3,11 +3,9 @@ package com.example.pokrovsk.controller;
 import com.example.pokrovsk.amqp.RMQBean;
 import com.example.pokrovsk.entity.Product;
 import com.example.pokrovsk.repo.ProductRepo;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,13 +24,13 @@ public class ProductController {
     }
 
 
-
     @GetMapping
     public String getIndex() {
         return "index";
     }
 
     @GetMapping("/")
+    @CrossOrigin(origins = "http://localhost:3000")
     public List<Product> getAllProducts() {
         List<Product> list = productRepo.findAll();
         log.info("All products had been gotten!");
@@ -48,6 +46,7 @@ public class ProductController {
         list.forEach(prod -> rmqBean.sendTo("product.amqp.queue", prod));
         return list;
     }
+
     @GetMapping("/product/{productName}")
     public List<Product> getProductByName(@PathVariable String productName) {
         List<Product> list = productRepo.findAll().stream().filter(p -> p.getName().toLowerCase().contains(productName.toLowerCase())).sorted(Comparator.comparing(Product::getName)).collect(Collectors.toList());
@@ -56,7 +55,7 @@ public class ProductController {
 
     @PostMapping("/addProduct")
     public void addProduct(@RequestBody Product product) {
-        if (product.getName().contains(");")||product.getDepartment().contains(");")) {
+        if (product.getName().contains(");") || product.getDepartment().contains(");")) {
             log.error("Кто-то хочет внести вред в нашу базу данных");
             throw new RuntimeException("Invalid name");
         }
@@ -71,9 +70,17 @@ public class ProductController {
         return producto;
     }
 
+    @DeleteMapping("/deleteAll_Yes")
+    public String deleteAllProducts() {
+        productRepo.deleteAll();
+        return "All products had been deleted!";
+    }
+
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable long id) {
         productRepo.findById(id).orElseGet(Product::new).setRemoved(true);
     }
+
+
 
 }
