@@ -4,6 +4,8 @@ import com.example.pokrovsk.amqp.RMQBean;
 import com.example.pokrovsk.entity.Product;
 import com.example.pokrovsk.repo.ProductRepo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
@@ -17,10 +19,13 @@ public class ProductController {
 
     ProductRepo productRepo;
     RMQBean rmqBean;
+    private final Environment env;
 
-    public ProductController(ProductRepo productRepo, RMQBean rmqBean) {
+    @Autowired
+    public ProductController(ProductRepo productRepo, RMQBean rmqBean, Environment env) {
         this.productRepo = productRepo;
         this.rmqBean = rmqBean;
+        this.env = env;
     }
 
 
@@ -79,6 +84,11 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable long id) {
         productRepo.findById(id).orElseGet(Product::new).setRemoved(true);
+    }
+
+    @GetMapping("/env")
+    public String getEnv() {
+        return env.getProperty("spring.datasource.password");
     }
 
 

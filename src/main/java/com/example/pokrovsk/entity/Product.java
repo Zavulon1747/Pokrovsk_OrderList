@@ -2,6 +2,7 @@ package com.example.pokrovsk.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -24,6 +25,7 @@ public class Product implements Serializable {
     private String department;
     @Column(name = "price_of_selling")
     private double priceOfSelling;
+    @CreationTimestamp
     @Column(name = "date_of_created")
     private LocalDateTime created;
     @Column(name = "date_of_modified")

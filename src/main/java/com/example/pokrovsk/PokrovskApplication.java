@@ -17,6 +17,12 @@ import java.time.LocalDateTime;
 
 public class PokrovskApplication implements CommandLineRunner {
 
+    private final ProductRepo productRepo;
+
+    public PokrovskApplication(ProductRepo productRepo) {
+        this.productRepo = productRepo;
+    }
+
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(PokrovskApplication.class);
         app.setBanner(new Banner() {
@@ -34,8 +40,6 @@ public class PokrovskApplication implements CommandLineRunner {
         });
         app.run(args);
     }
-    @Autowired
-    private ProductRepo productRepo;
 
     @Override
     public void run(String... args) throws Exception {
@@ -46,5 +50,7 @@ public class PokrovskApplication implements CommandLineRunner {
         this.productRepo.save(new Product("Цемент", 5, "Строительный", 349.9));
         this.productRepo.save(new Product("Средство для мойки полов", 5, "Химия", 120.0));
     }
+
+    String sql = "SELECT * FROM product WHERE name LIKE '%яблоко%'";
 
 }
